@@ -5,8 +5,9 @@ public class NetFileData {
 	private String fileName = "$error";// 文件名称，不含目录信息,默认值用于表示文件出错
 	private String filePath = ".\\";// 该文件对象所处的目录，默认值为当前相对目录
 	private String fileSizeStr = "0";// 文件的大小，用字符串表示，能智能地选择B、KB、MB、GB来表达
-	private boolean isDirectory = false;// true为文件夹，false为文件
-	private String fileModifiedDate = "1970-01-01 00:00:00";// 文件最近修改日期，默认值为1970年基准时间
+	private int isDirectory = 0;// "0"为文件，"1"为目录，"2"为根目录
+	private String fileModifiedDate = "1970-01-01 00:00:00";// 文件最近修改日期，默认值为1970年基准
+	//fileName+fileDate+fileSize+idDir
 	public NetFileData(String fileInfo, String filePath) {
 		super();
 		try{
@@ -15,7 +16,7 @@ public class NetFileData {
 			this.fileName=array[0];
 			this.fileModifiedDate=array[1];
 			this.fileSize=new Long(array[2]);
-			this.isDirectory=(array[3].equals("1"));
+			this.isDirectory=Integer.parseInt(array[3]);
 			this.fileSizeStr=parseFileSize(this.fileSize);
 		}catch(Exception e){
 			
@@ -46,10 +47,10 @@ public class NetFileData {
 	public void setFileSizeStr(String fileSizeStr) {
 		this.fileSizeStr = fileSizeStr;
 	}
-	public boolean isDirectory() {
+	public int getFileType() {
 		return isDirectory;
 	}
-	public void setDirectory(boolean isDirectory) {
+	public void setDirectory(int isDirectory) {
 		this.isDirectory = isDirectory;
 	}
 	public String getFileModifiedDate() {
@@ -80,5 +81,6 @@ public class NetFileData {
 		sizeStr=new String().format("%dB", (int)fileSize2);
 		return sizeStr;
 	}
+
 
 }

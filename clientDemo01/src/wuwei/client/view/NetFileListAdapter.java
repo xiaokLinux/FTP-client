@@ -41,7 +41,7 @@ public class NetFileListAdapter extends ArrayAdapter<NetFileData> {
 		TextView tv3=(TextView) convertView.findViewById(R.id.textView3);
 		
 		NetFileData fileData=netFileList.get(position);
-		if(fileData.isDirectory()){
+		if(fileData.getFileType()>=1){
 			iv.setImageResource(image_folder_id);
 			tv2.setText("");
 		}else{

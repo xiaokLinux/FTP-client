@@ -18,19 +18,33 @@ import android.util.Log;
 
 public class CmdClientSocket {
 
-	int port;
-	String ip;
-	int MsgType;
-	int connect_timeout=2000;
-	boolean isDebug=true;					//	处于debug模式
-	Handler handler;
-	Socket socket;
-	private BufferedReader bufferedReader;
-	private OutputStreamWriter writer;
-	public static final String KEY_SERVER_ACK_MSG="KEY_SERVER_ACK_MSG";
-	public static final int SERVER_MSG_ERROR=1;			//异常返回值
-	public static final int SERVER_MSG_OK=0;			//正常结束
-	
+//	int port;
+//	String ip;
+//	int MsgType;
+//	int connect_timeout=2000;
+//	boolean isDebug=true;					//	处于debug模式
+//	Handler handler;
+//	Socket socket;
+//	private BufferedReader bufferedReader;
+//	private OutputStreamWriter writer;
+//	public static final String KEY_SERVER_ACK_MSG="KEY_SERVER_ACK_MSG";
+//	public static final int SERVER_MSG_ERROR=1;			//异常返回值
+//	public static final int SERVER_MSG_OK=0;			//正常结束
+	public static  int SERVER_MSG_OK=0;//   用于发送给句柄的消息类型,放在消息的arg2中，表示服务端正常
+	public static  int SERVER_MSG_ERROR=1;//   表示服务端出错
+	public static  String STATUS_OK="ok";//   服务端正常时，返回的消息识别字符串
+	public static  final String  KEY_SERVER_ACK_MSG  = "KEY_SERVER_ACK_MSG";
+	public static  boolean isDebug=true;
+	private int  port;
+	private String  ip;
+	private int  connect_timeout  = 2000;//   设置socket 连接的超时时间，单位：ms
+	private int  transfer_timeout  = 10000;//   设置socket 连接的超时时间，单位：ms
+	private Handler  handler;//  句柄的Message 对象
+	private Socket  socket;
+	private int  msgType=SERVER_MSG_ERROR;//msgType=0,     服务端正常执行，msgType=1 ，服务端执行出错
+	private BufferedReader   bufferedReader;
+	private OutputStreamWriter   writer;
+
 	
 	public CmdClientSocket(String ip, int port, Handler handler) {
 		super();
@@ -66,25 +80,30 @@ public class CmdClientSocket {
 	public void doCmdTask(String cmd){
 		ArrayList<String> msgList=new ArrayList<String>();
 		try{
-			connect();
-			writeCmd(cmd);
-			msgList=readSocketMsg();
-			MsgType=SERVER_MSG_OK;
+			connect();				// 连接服务端，若有异常，被捕捉
+			writeCmd(cmd);			//  向服务端发送命令，未关闭输出流
+			msgList=readSocketMsg();//  读取socket 输入流信息，并将结果存入msgList 列表
+			//若服务端返回信息的状态为"ok"，则将msgType  设置为自定义常量SERVER_MSG_OK （实际值为0）
+			//服务端返回信息状态不是"ok"，则将msgType  为SERVER_MSG_ERROR  （实际值为1）
+			close();// 关闭Socket 的输入流、输出流
+//			MsgType=SERVER_MSG_OK;
 		}catch(IOException e){
-			msgList.clear();
-			msgList.add(e.toString());//在msgList列表中放入错误信息
-			MsgType=SERVER_MSG_ERROR;
+			msgType=SERVER_MSG_ERROR;//   若捕捉到异常，则设置msgType 为SERVER_MSG_ERROR   （实际值为1）
+			//SERVER_MSG_ERROR  和SERVER_MSG_OK  为自定义常量
+			//public  static int SERVER_MSG_OK=0;//   用于发送给句柄的消息类型,放在消息的arg2中，表示服务端正常
+			//public  static int SERVER_MSG_ERROR=1;//    表示服务端出错
+			msgList.add(e.toString());//    在msgList 列表中放入错误信息
 			e.printStackTrace();
 		}
-		close();
 		Message message = handler.obtainMessage();
-		message.arg2=MsgType;
-		//句柄bundle在handleMessage(Message msg)函数中首先对消息的arg2进行判断，若是SERVER_MSG_ERROR类型，则不更新列表，Toast显示错误信息
-	    //若message.arg2是SERVER_MSG_OK，则更新列表UI
-		Bundle bundle=new Bundle();
-		bundle.putStringArrayList(KEY_SERVER_ACK_MSG, msgList);
+		Bundle bundle  = new Bundle();
+		bundle.putStringArrayList(KEY_SERVER_ACK_MSG,    msgList);//  回传数据需要对msgList 的size进行判断，大于0才为有效
+		message.arg2=msgType;
+		//句柄bundle 在handleMessage(Message   msg)函数中首先对消息的arg2进行判断，若是SERVER_MSG_ERROR  类型，则不更新列表，Toast 显示错误信息
+		//若message.arg2  是SERVER_MSG_OK ，则更新列表UI
 		message.setData(bundle);
-		handler.sendMessage(message);
+		handler.sendMessage(message);//      通过句柄通知主UI数据传输完毕，并回传数据
+
 	}
 	/**
 	 * 
@@ -101,7 +120,19 @@ public class CmdClientSocket {
 		String lineNumStr=bufferedReader.readLine();
 		int lineNum=Integer.parseInt(lineNumStr);
 		Log.e("[CHECK]","lineNum:"+lineNum);
-		for(int i=0;i<lineNum;i++){
+		msgType=SERVER_MSG_ERROR;
+		if(lineNum<1){
+			msgList.add("Receive  empty  message");
+			return msgList;
+		}
+		String status  = bufferedReader.readLine();
+		if(status.equalsIgnoreCase(STATUS_OK)){
+			msgType=SERVER_MSG_OK;
+		}else{
+			msgList.add(status);//   将服务端的错误信息放入消息列表
+		}
+		//	    反馈状态已读，故从1开始索引
+		for(int i=1;i<lineNum;i++){
 			String str=bufferedReader.readLine();
 			msgList.add(str);
 		}
@@ -110,9 +141,15 @@ public class CmdClientSocket {
 	}
 	private void writeCmd(String cmd) throws IOException {
 		// TODO Auto-generated method stub
+		//socket.getOutputStream()          是输出流，BufferedOut
+		//
+		//OutputStreamWriter  writer=new  OutputStreamWriter(os);//    默认的字符编码，有可能是GB2312 也有可能是UTF-8 ，取决于系统
+		//建议不要用默认字符编码，而是指定UTF-8 ，以保证发送接收字符编码一致，不至于出乱码
+		//输出流是字节传输的，还不具备字符串直接写入功能，因此再将其封装入OutputStreamWriter   ，使其支持字符串直接写入
+
 		BufferedOutputStream os=new BufferedOutputStream(socket.getOutputStream());
 		writer=new OutputStreamWriter(os,"gb2312");
-		writer.write("1\n");
+		writer.write("1\n");//   未真正写入的输出流，仅仅在内存中
 		writer.write(cmd+"\n");
 		Log.e("[Check]", "writeCmd:"+cmd);
 		writer.flush();
