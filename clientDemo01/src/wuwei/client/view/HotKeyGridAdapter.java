@@ -18,6 +18,7 @@ public class HotKeyGridAdapter extends ArrayAdapter<HotKeyData> {
 	Context context;
 	List<HotKeyData>  list;
 	CmdClientSocket  cmdClientSocket;
+	String  cmd;
 	public HotKeyGridAdapter(Context   context,   List<HotKeyData>  list,CmdClientSocket   cmdClientSocket)  {
 		super(context,  android.R.layout.simple_list_item_1,    list);
 		this.context=context;
@@ -26,7 +27,7 @@ public class HotKeyGridAdapter extends ArrayAdapter<HotKeyData> {
 		// TODO Auto-generated   constructor stub
 	}
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		// TODO Auto-generated method stub
 		ViewHolder  viewHolder;
 		if(convertView==null){
@@ -38,11 +39,12 @@ public class HotKeyGridAdapter extends ArrayAdapter<HotKeyData> {
 		viewHolder  = (ViewHolder)  convertView.getTag();
 		TextView  tv=viewHolder.textView;
 		tv.setText(list.get(position).getHotkeyName());
-		final String  cmd=list.get(position).getHotkeyCmd();
+		
 		tv.setOnClickListener(new   TextView.OnClickListener() {
 			@Override
 			public void  onClick(View  v) {
 			// TODO Auto-generated   method stub
+			cmd=list.get(position).getHotkeyCmd();
 			cmdClientSocket.work(cmd);
 			}
 

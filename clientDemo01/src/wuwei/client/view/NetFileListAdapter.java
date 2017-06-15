@@ -29,8 +29,8 @@ public class NetFileListAdapter extends ArrayAdapter<NetFileData> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		// TODO Auto-generated method stub
-		int image_folder_id=R.drawable.folder;//文件夹图片
-		int image_file_id=R.drawable.folder;
+		int image_folder_id=R.drawable.file;//文件夹图片
+		int image_file_id=R.drawable.dir;		
 		if(convertView==null){
 			convertView=LayoutInflater.from(context).inflate(
 					R.layout.item, null,false);
@@ -46,11 +46,50 @@ public class NetFileListAdapter extends ArrayAdapter<NetFileData> {
 			tv2.setText("");
 		}else{
 			iv.setImageResource(image_file_id);
+			setTrueImage(iv,fileData.getFileName());
 			tv3.setText(fileData.getFileSizeStr());
 		}
 		tv1.setText(fileData.getFileName());
 		tv2.setText(fileData.getFileModifiedDate());
 		return convertView;
+	}
+	private void setTrueImage(ImageView iv, String fileName) {
+		// TODO Auto-generated method stub
+		int image_ppt_id=R.drawable.ppt;
+		int image_exe_id=R.drawable.exe;
+		int imge_txt_id=R.drawable.txt;
+		int image_mov_id=R.drawable.movies;
+		int image_html_id=R.drawable.html;
+		int image_music_id=R.drawable.music;
+		String fileType="";
+		int idx =  fileName.lastIndexOf(".");
+		if(idx>0){// 有扩展名
+			fileType=fileName.substring(idx+1);
+		}
+		else{
+			return;
+		}
+		if(fileType.equalsIgnoreCase("avi")|fileType.equalsIgnoreCase("mpeg")|fileType.equalsIgnoreCase("mov")|fileType.equalsIgnoreCase("mp4")){
+			iv.setImageResource(image_mov_id);
+		}
+		if(fileType.equalsIgnoreCase("flv")|fileType.equalsIgnoreCase("flac")|fileType.equalsIgnoreCase("mkv")){
+			iv.setImageResource(image_mov_id);
+		}
+		if(fileType.equalsIgnoreCase("mpg")|fileType.equalsIgnoreCase("wmv")|fileType.equalsIgnoreCase("rmvb")){
+			iv.setImageResource(image_mov_id);
+		}
+		if(fileType.equalsIgnoreCase("txt")){
+			iv.setImageResource(imge_txt_id);
+		}
+		if(fileType.equalsIgnoreCase("ppt")|fileType.equalsIgnoreCase("pptx")){
+			iv.setImageResource(image_ppt_id);
+		}
+		if(fileType.equalsIgnoreCase("html")){
+			iv.setImageResource(image_html_id);
+		}
+		if(fileType.equalsIgnoreCase("mp3")){
+			iv.setImageResource(image_music_id);
+		}
 	}
 	
 	

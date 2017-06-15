@@ -11,10 +11,13 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import wuwei.client.app.MainActivity;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 public class CmdClientSocket {
 
@@ -85,6 +88,11 @@ public class CmdClientSocket {
 			msgList=readSocketMsg();//  读取socket 输入流信息，并将结果存入msgList 列表
 			//若服务端返回信息的状态为"ok"，则将msgType  设置为自定义常量SERVER_MSG_OK （实际值为0）
 			//服务端返回信息状态不是"ok"，则将msgType  为SERVER_MSG_ERROR  （实际值为1）
+			if(cmd.substring(0, 3).equals("dlf")){
+				Log.e("dp",""+msgList.size());
+				String dport=msgList.get(2);	
+				Log.e("dp",""+dport);
+			}
 			close();// 关闭Socket 的输入流、输出流
 //			MsgType=SERVER_MSG_OK;
 		}catch(IOException e){

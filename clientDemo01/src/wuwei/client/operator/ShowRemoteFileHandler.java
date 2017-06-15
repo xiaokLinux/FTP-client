@@ -1,6 +1,7 @@
 package wuwei.client.operator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import wuwei.client.data.NetFileData;
 import wuwei.client.socket.CmdClientSocket;
@@ -40,7 +41,26 @@ public class ShowRemoteFileHandler extends Handler {
 			NetFileData data=new NetFileData(fileInfo, filePath);
 			netFileList.add(data);
 		}
-		NetFileListAdapter adapter=new NetFileListAdapter(context, netFileList);
+		/**
+         * ÎÄ¼þÅÅÐò
+         */
+        ArrayList<NetFileData> fileData_final = new ArrayList<NetFileData>();
+        ArrayList<NetFileData> fileData_dir = new ArrayList<NetFileData>();
+        ArrayList<NetFileData> fileData_file = new ArrayList<NetFileData>();
+
+        for (NetFileData item : netFileList) {
+            if (item.getFileType()>=1)
+                fileData_dir.add(item);
+            else
+                fileData_file.add(item);
+
+        }
+        Collections.sort(fileData_dir);
+        Collections.sort(fileData_file);
+        fileData_final.addAll(fileData_dir);
+        fileData_final.addAll(fileData_file);
+		NetFileListAdapter adapter=new NetFileListAdapter(context, fileData_final);
+		
 		listView.setAdapter(adapter);
 		super.handleMessage(msg);
 	}

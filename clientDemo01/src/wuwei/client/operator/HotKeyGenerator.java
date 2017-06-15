@@ -39,7 +39,7 @@ public class HotKeyGenerator {
 		return fileType;//    若是文件夹或者无扩展名，则fileType=""
 	}
 	private static  boolean  checkIsMovie(String  fileType){
-		if(fileType.equalsIgnoreCase("avi")|fileType.equalsIgnoreCase("mpeg")|fileType.equalsIgnoreCase("mov")){
+		if(fileType.equalsIgnoreCase("avi")|fileType.equalsIgnoreCase("mpeg")|fileType.equalsIgnoreCase("mov")|fileType.equalsIgnoreCase("mp4")){
 				return true;
 		}
 		if(fileType.equalsIgnoreCase("flv")|fileType.equalsIgnoreCase("flac")|fileType.equalsIgnoreCase("mkv")){

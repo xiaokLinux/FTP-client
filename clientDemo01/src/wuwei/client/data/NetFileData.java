@@ -1,6 +1,6 @@
 package wuwei.client.data;
 
-public class NetFileData {
+public class NetFileData implements Comparable {
 	private long fileSize = 0;// 文件长度应该long型数据，否则大于2GB的文件大小无法表达
 	private String fileName = "$error";// 文件名称，不含目录信息,默认值用于表示文件出错
 	private String filePath = ".\\";// 该文件对象所处的目录，默认值为当前相对目录
@@ -80,6 +80,11 @@ public class NetFileData {
 		}
 		sizeStr=new String().format("%dB", (int)fileSize2);
 		return sizeStr;
+	}
+	@Override
+	public int compareTo(Object another) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 

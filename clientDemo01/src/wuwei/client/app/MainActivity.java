@@ -51,6 +51,74 @@ public class MainActivity extends Activity {
         et2 = (EditText)  findViewById(R.id.editText2);//y
         test=(EditText) findViewById(R.id.editText3);
         
+        Button bt1=(Button) findViewById(R.id.button2);
+        Button bt2=(Button) findViewById(R.id.button3);
+        Button bt3=(Button) findViewById(R.id.button4);
+        Button bt4=(Button) findViewById(R.id.button5);
+        Button bt5=(Button) findViewById(R.id.button6);
+        Button bt6=(Button) findViewById(R.id.button7);
+		bt5.setOnClickListener(new Button.OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						String cmd="clk:left";
+						CmdClientSocket  cmdClientSocket  = new  CmdClientSocket(ip,  port,showRemoteFileHandler);
+			        	cmdClientSocket.work(cmd);
+					}
+				});
+		bt6.setOnClickListener(new Button.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				String cmd="clk:right";
+				CmdClientSocket  cmdClientSocket  = new  CmdClientSocket(ip,  port,showRemoteFileHandler);
+		    	cmdClientSocket.work(cmd);
+			}
+		});
+        bt1.setOnClickListener(new Button.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				String cmd="mov:0,-7";
+				CmdClientSocket  cmdClientSocket  = new  CmdClientSocket(ip,  port,showRemoteFileHandler);
+	        	cmdClientSocket.work(cmd);
+			}
+		});
+		bt2.setOnClickListener(new Button.OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						String cmd="mov:0,7";
+						CmdClientSocket  cmdClientSocket  = new  CmdClientSocket(ip,  port,showRemoteFileHandler);
+			        	cmdClientSocket.work(cmd);
+					}
+				});
+		bt3.setOnClickListener(new Button.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				String cmd="mov:-7,0";
+				CmdClientSocket  cmdClientSocket  = new  CmdClientSocket(ip,  port,showRemoteFileHandler);
+	        	cmdClientSocket.work(cmd);
+			}
+		});
+		bt4.setOnClickListener(new Button.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				String cmd="mov:7,0";
+				CmdClientSocket  cmdClientSocket  = new  CmdClientSocket(ip,  port,showRemoteFileHandler);
+	        	cmdClientSocket.work(cmd);
+			}
+		});
+        
+        
         listView  = (ListView) findViewById(R.id.listView1);//y
         showRemoteFileHandler  =  new ShowRemoteFileHandler(MainActivity.this,    listView);
         showNonUiUpdateCmdHandler=new   ShowNonUiUpdateCmdHandler(MainActivity.this);
@@ -66,7 +134,7 @@ public class MainActivity extends Activity {
 	        	String portStr  = et2.getText().toString();
 	        	port=Integer.parseInt(portStr);
 	        	CmdClientSocket  cmdClientSocket  = new  CmdClientSocket(ip,  port,showRemoteFileHandler);
-	        	//cmdClientSocket.work("dir:...");//    列出盘符
+	        	//cmdClientSocket.work("dir:...");//    列出盘符	       
 	        	//debug
 	        	String cmd=test.getText().toString();
 	        	cmdClientSocket.work(cmd);
